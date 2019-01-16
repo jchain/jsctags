@@ -55,6 +55,7 @@ var file = (function() {
 })();
 
 var outputTags = function(tags) {
+  // console.log(tags);
   var ctags = flatten(jsctags.ctags(tags));
   console.log(ctags.join(''));
 };
@@ -79,7 +80,22 @@ var onResults = function(err, results) {
     return true;
   });
 
+  for(var i = 0; i < tags[0].length; i++) {
+      var path = tags[0][i].tagfile.replace(/\\/g, '/');
+      path = path.replace(/C:/g, '/cygdrive/c');
+
+      tags[0][i].tagfile = path;
+      tags[0].tagfile = path;
+  }
+  // console.log(tags);
+  // var path = results.tagfile.replace(/\\/g, '/');
+  // path = path.replace(/C:/g, '/cygdrive/c');
+  // tags.tagfile = path;
+  // console.log(results.tagfile);
+
   tags.tagfile = results.tagfile;
+  // console.log(results);
+  // console.log(tags.tagfile);
 
   fn(tags);
 };
@@ -125,6 +141,11 @@ var fromFiles = function() {
   async.map(
     files,
     function(file, fn) {
+        // console.log("from file: %s", file);
+        if (file.includes("C:\\tmp")) {
+            file = file.replace(/C:\\/g, "C:\\cygwin64\\");
+            // console.log("Cygwin");
+        }
       fs.readFile(file, 'utf8', function(err, content) {
         if (err) {
           return fn(null, err);
